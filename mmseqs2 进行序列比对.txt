@@ -1,0 +1,13 @@
+1. #下载swissprot数据库
+mmseqs databases UniProtKB/Swiss-Prot outpath/swissprot tmp
+# UniProtKB/Swiss-Prot是数据库名称 outpath/swissprot是要存入地文件名，可以不存在，会自动建立
+2. #直接使用上述地swissprot 进行比对
+mmseqs easy-search DATA/example.fasta outpath/swissprot pitput.fasta tmp --format-mode 2
+3.#提取同源序列
+mmseqs convertalis DATA/example.fasta swissprot resultDB result.m8
+4.#提取同源序列ID
+awk '{print $2}' result.m8 | sort | uniq > target_ids.txt
+5 #从目标数据库中提取序列：（安装seqkit：conda install -c bioconda seqkit）
+seqkit grep -f target_ids.txt swissprot.fasta -o homologous_sequences.fasta   
+6 #生成多序列比对（MSA）（安装Cluster Omega：conda install -c bioconda clustalo）
+clustalo -i homologous_sequences.fasta -o msa_output.fasta
